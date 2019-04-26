@@ -101,6 +101,7 @@ venv.bak/
 /site
 
 # mypy
+.DS_Store
 .mypy_cache/
 .idea/
 MNIST/
