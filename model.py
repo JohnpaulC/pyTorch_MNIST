@@ -17,13 +17,18 @@ class ConvNN(nn.Module):
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, 10)
 
-    def forward(self, x):
+    def forward(self, x, apply_softmax = False):
         x = self.pool(F.relu(self.conv1(x)))
         x = self.pool(F.relu(self.conv2(x)))
         # Change to 1 dimensional Tensor
         x = x.view(-1, 16 * 7 * 7)
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
-
         x = self.fc3(x)
-        return x
+
+        if apply_softmax:
+            y_pred = F.softmax(x, dim=1)
+        else:
+            y_pred = x
+
+        return y_pred
