@@ -15,11 +15,11 @@ transform = transforms.Compose([
 ])
 
 trainset = MNIST('MNIST', transform=transform)
-trainloader = torch.utils.data.DataLoader(trainset, batch_size=2,
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=32,
                                           shuffle=True, num_workers=2)
 
 testset = MNIST('MNIST', train = False, transform=transform)
-testloader = torch.utils.data.DataLoader(testset, batch_size=2,
+testloader = torch.utils.data.DataLoader(testset, batch_size=128,
                                           shuffle=True, num_workers=2)
 
 Debug_flag = 0
@@ -36,14 +36,16 @@ exp_lr_scheduler = optim.lr_scheduler.StepLR(optimizer, step_size= 50, gamma= 0.
 since = time.time()
 best_model_wts = copy.deepcopy(model.state_dict())
 best_acc = 0.0
+total_acc = 0.0
 
 for i in range(epoch):
 
+    exp_lr_scheduler.step()
     loss_show = 0
     for j, train_data in enumerate(trainloader):
         optimizer.zero_grad()
-        if Debug_flag == 10:
-            break
+        # if Debug_flag == 10:
+        #     break
         train_img = train_data[0].to(device)
         label = train_data[1].to(device)
 
@@ -53,25 +55,29 @@ for i in range(epoch):
         loss_show += loss
         loss.backward()
         optimizer.step()
-        exp_lr_scheduler.step()
-        Debug_flag += 1
 
-    print(loss_show)
+        # Debug_flag += 1
+
+    print("The Train loss is {0:8.5f}".format(loss_show))
     print("-" * 20)
     Debug_flag = 0
-    for j, test_data in enumerate(testloader):
-        if Debug_flag == 2:
-            break
-        test_img = test_data[0].to(device)
-        label = test_data[1].to(device)
+    with torch.no_grad():
+        for j, test_data in enumerate(testloader):
+            # if Debug_flag == 2:
+            #     break
+            test_img = test_data[0].to(device)
+            label = test_data[1].to(device)
 
-        _, pred = model(test_img, apply_softmax=True).max(dim=1)
-        print(pred)
-        print(label)
-        acc = get_accuracy(pred, label)
-        print(acc)
-        Debug_flag += 1
+            _, pred = model(test_img, apply_softmax=True).max(dim=1)
+            # print("The prediction is ")
+            # print(pred)
+            # print("The label is ")
+            # print(label)
+            acc = get_accuracy(pred, label)
+            total_acc = (acc + total_acc) / 2 if total_acc != 0.0 else acc
 
+            # Debug_flag += 1
+    print("acc is {0:4.1f}%".format(acc))
 
     print("{0:2d} epochs ends".format(i))
 
