@@ -45,6 +45,7 @@ for i in range(epoch):
         # if Debug_flag == 10:
         #     break
         train_img = train_data[0].to(device)
+        print(train_img.shape)
         label = train_data[1].to(device)
 
         pred = model(train_img)
