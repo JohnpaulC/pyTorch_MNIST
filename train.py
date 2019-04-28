@@ -81,3 +81,4 @@ for i in range(epoch):
     print("{0:2d} epochs ends".format(i))
 
 torch.save(model.state_dict(), "model.pt")
+
