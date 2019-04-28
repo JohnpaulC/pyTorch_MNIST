@@ -5,7 +5,7 @@ import torchvision
 from torchvision.datasets import MNIST
 from torchvision import transforms
 from model import ConvNN
-from utils import get_accuracy
+from utils import get_accuracy, plot_result
 import time
 import copy
 
@@ -23,29 +23,32 @@ testloader = torch.utils.data.DataLoader(testset, batch_size=128,
 Debug_flag = 0
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-epoch = 5
+epoch = 30
 model = ConvNN()
 model = model.to(device)
 lr = 1e-4
 optimizer = optim.Adam(model.parameters(), lr=lr)
 loss_fn = nn.CrossEntropyLoss()
-exp_lr_scheduler = optim.lr_scheduler.StepLR(optimizer, step_size= 50, gamma= 0.1)
+exp_lr_scheduler = optim.lr_scheduler.StepLR(optimizer, step_size= 10, gamma= 0.1)
 
 since = time.time()
 best_model_wts = copy.deepcopy(model.state_dict())
-best_acc = 0.0
+best_acc = [0]
 total_acc = 0.0
 
-for i in range(epoch):
 
+'''
+    Training Process
+'''
+for i in range(epoch):
     exp_lr_scheduler.step()
     loss_show = 0
+    model.train()
     for j, train_data in enumerate(trainloader):
         optimizer.zero_grad()
         # if Debug_flag == 10:
         #     break
         train_img = train_data[0].to(device)
-        print(train_img.shape)
         label = train_data[1].to(device)
 
         pred = model(train_img)
@@ -60,6 +63,11 @@ for i in range(epoch):
     print("The Train loss is {0:8.5f}".format(loss_show))
     print("-" * 20)
     Debug_flag = 0
+
+    '''
+        After one epoch using testset to get the final acc
+    '''
+    model.eval()
     with torch.no_grad():
         for j, test_data in enumerate(testloader):
             # if Debug_flag == 2:
@@ -76,9 +84,10 @@ for i in range(epoch):
             total_acc = (acc + total_acc) / 2 if total_acc != 0.0 else acc
 
             # Debug_flag += 1
-    print("acc is {0:4.1f}%".format(acc))
-
+    print("acc is {0:4.1f}%".format(total_acc))
+    best_acc.append(total_acc)
     print("{0:2d} epochs ends".format(i))
 
+plot_result(best_acc, 0)
 torch.save(model.state_dict(), "model.pt")
 
