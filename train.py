@@ -13,11 +13,9 @@ import copy
 transform = transforms.Compose([
     transforms.ToTensor()
 ])
-
 trainset = MNIST('MNIST', transform=transform)
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=32,
                                           shuffle=True, num_workers=2)
-
 testset = MNIST('MNIST', train = False, transform=transform)
 testloader = torch.utils.data.DataLoader(testset, batch_size=128,
                                           shuffle=True, num_workers=2)
@@ -25,7 +23,7 @@ testloader = torch.utils.data.DataLoader(testset, batch_size=128,
 Debug_flag = 0
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-epoch = 10
+epoch = 5
 model = ConvNN()
 model = model.to(device)
 lr = 1e-4
@@ -81,3 +79,4 @@ for i in range(epoch):
 
     print("{0:2d} epochs ends".format(i))
 
+torch.save(model.state_dict(), "model.pt")
