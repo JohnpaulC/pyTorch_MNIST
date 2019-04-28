@@ -24,7 +24,7 @@ class ConvNN(nn.Module):
         # Change to 1 dimensional Tensor
         x = x.view(-1, 16 * 7 * 7)
         x = F.relu(self.fc1(x))
-        x = self.dropout(x)
+        #x = self.dropout(x)
         x = F.relu(self.fc2(x))
         x = self.fc3(x)
         if apply_softmax:
