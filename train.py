@@ -23,17 +23,17 @@ testloader = torch.utils.data.DataLoader(testset, batch_size=128,
 Debug_flag = 0
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-epoch = 30
+epoch = 50
 model = ConvNN()
 model = model.to(device)
-lr = 1e-4
+lr = 1e-3
 optimizer = optim.Adam(model.parameters(), lr=lr)
 loss_fn = nn.CrossEntropyLoss()
 exp_lr_scheduler = optim.lr_scheduler.StepLR(optimizer, step_size= 10, gamma= 0.1)
 
 since = time.time()
 best_model_wts = copy.deepcopy(model.state_dict())
-best_acc = [0]
+best_acc = []
 total_acc = 0.0
 
 
@@ -88,6 +88,6 @@ for i in range(epoch):
     best_acc.append(total_acc)
     print("{0:2d} epochs ends".format(i))
 
-plot_result(best_acc, 0)
+plot_result(best_acc)
 torch.save(model.state_dict(), "model.pt")
 
